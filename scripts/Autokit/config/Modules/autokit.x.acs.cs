@@ -23,8 +23,5 @@ function Auto::Health(%health) {
 		Schedule::Add("Auto::Health();", 0.1);
 }
 
-if ($xEvent::Loaded) {
-	Event::Attach(eventPlayerDamage, Auto::Health); // Requires xEvent.dll
-} else {
-	Event::Attach(eventConnected, Auto::Health); // Run with Schedule
-}
+Event::Attach(eventConnected, Auto::Health);
+Event::Attach(eventPlayerDamage, Auto::Health); // Requires xEvent.dll
