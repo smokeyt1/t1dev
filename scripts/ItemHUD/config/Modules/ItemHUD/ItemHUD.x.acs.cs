@@ -1,3 +1,5 @@
+// Updated to support xEvent.dll
+
 function ItemHUD::Init() {
 	if ($ItemHUD::Loaded)
 		return;
