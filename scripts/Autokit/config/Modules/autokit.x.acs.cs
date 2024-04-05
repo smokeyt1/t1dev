@@ -1,9 +1,9 @@
 // Autokit
 // Supports xEvent.dll
 // By Smokey
-// v0.1
+// v0.2
 
-function Auto::Health(%health) {
+function Auto::Health(%health, %prevHealth) {
 	if ($Station::Type == "Inventory" || $Station::Type == "RemoteInventory") {
 		Schedule::Cancel("Auto::Health();");
 		Schedule::Add("Auto::Health();", 9);
@@ -24,4 +24,4 @@ function Auto::Health(%health) {
 }
 
 Event::Attach(eventConnected, Auto::Health);
-Event::Attach(eventPlayerDamage, Auto::Health); // Requires xEvent.dll
+Event::Attach(eventHealthUpdate, Auto::Health); // Requires xEvent.dll
