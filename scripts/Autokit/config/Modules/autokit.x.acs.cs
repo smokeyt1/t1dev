@@ -1,7 +1,7 @@
 // Autokit
 // Supports xEvent.dll
 // By Smokey
-// v0.2
+// v0.3
 
 function Auto::Health(%health, %prevHealth) {
 	if ($Station::Type == "Inventory" || $Station::Type == "RemoteInventory") {
@@ -23,5 +23,14 @@ function Auto::Health(%health, %prevHealth) {
 		Schedule::Add("Auto::Health();", 0.1);
 }
 
+function Auto::ItemUpdate(%item, %delta) {
+    %desc = getItemDesc(%item);
+
+    if (%desc == "Repair Kit")
+		Auto::Health();
+
+}
+
 Event::Attach(eventConnected, Auto::Health);
 Event::Attach(eventHealthUpdate, Auto::Health); // Requires xEvent.dll
+Event::Attach(eventItemCountUpdate, Auto::ItemUpdate); // Requires xEvent.dll
