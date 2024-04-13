@@ -1,17 +1,19 @@
 // TV2 for Tribes 1.40/1.41
 // Install to config/Modules
 // By Smokey
-// v0.2
+// v0.3
 //
 // Enhanced TV script with additional features:
 // - Game binds in Options menu
 // - Player scrolling with scroll wheel
 // - Menu toggle feature
 // - Additional fixes
-//
+// - Support for xPrefs
 
-function TV2::GameBinds::Init() after GameBinds::Init
-{
+function TV2::GameBinds::Init() after GameBinds::Init {
+	if ($xPrefs::Installed)
+		return;
+
 	$GameBinds::CurrentMapHandle = GameBinds::GetActionMap2( "playMap.sae");
 	$GameBinds::CurrentMap = "playMap.sae";
 	GameBinds::addBindCommand( "TV2 Toggle Menu", "TV2::ToggleMenu();");
@@ -294,3 +296,16 @@ Event::Attach(eventGuiClose, TV2::OnGuiChange);
 Event::Attach(eventGuiOpen, TV2::OnGuiChange);
 Event::Attach(eventFlagGrab, TV2::OnFlagTaken);
 Event::Attach(eventFlagPickup, TV2::OnFlagTaken);
+
+// ================================================================================
+// xPrefs Support
+// ================================================================================
+
+function TV2::xSetup() after xPrefs::Setup {
+    xPrefs::Create("TV2", "TV2::xInit");
+}
+
+function TV2::xInit() {
+	xPrefs::addBindCommand("playMap.sae", "Toggle Menu", "TV2::ToggleMenu();");
+	xPrefs::addBindCommand("playMap.sae", "Observe Carrier", "TV2::Carrier();", "TV2::Cancel();");
+}
