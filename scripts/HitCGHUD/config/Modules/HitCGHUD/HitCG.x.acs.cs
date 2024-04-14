@@ -29,21 +29,18 @@ function HitCGHUD::Init() {
     %x = ((%w/2) - (%hm/2));
     %y = ((%h/2) - (%hm/2));
     
-	Hud::New( "HitCG1_Hud", %x, %y, %hm, %hm, HitCGHUD::Wake, HitCGHUD::Sleep );
-
-    // Override $pref position
-    %obj = Control::getId("HitCG1_Hud");
-    %obj.position = %x ~ " " ~ %y;
+    $pref::hudPositionsHitCGHUD::Container = "";
+	Hud::New( "HitCGHUD::Container", %x, %y, %hm, %hm, HitCGHUD::Wake, HitCGHUD::Sleep );
 
 	newObject("HitCGHUD::Marker100", FearGuiFormattedText, 0, 0, %hm, %hm);
     newObject("HitCGHUD::Marker75", FearGuiFormattedText, 0, 0, %hm, %hm);
     newObject("HitCGHUD::Marker50", FearGuiFormattedText, 0, 0, %hm, %hm);
     newObject("HitCGHUD::Marker25", FearGuiFormattedText, 0, 0, %hm, %hm);
     
-	Hud::Add( "HitCG1_Hud", "HitCGHUD::Marker100" );
-    Hud::Add( "HitCG1_Hud", "HitCGHUD::Marker75" );
-    Hud::Add( "HitCG1_Hud", "HitCGHUD::Marker50" );
-    Hud::Add( "HitCG1_Hud", "HitCGHUD::Marker25" );
+	Hud::Add( "HitCGHUD::Container", "HitCGHUD::Marker100" );
+    Hud::Add( "HitCGHUD::Container", "HitCGHUD::Marker75" );
+    Hud::Add( "HitCGHUD::Container", "HitCGHUD::Marker50" );
+    Hud::Add( "HitCGHUD::Container", "HitCGHUD::Marker25" );
     
     Control::SetVisible("HitCGHUD::Marker100", false);
     Control::SetVisible("HitCGHUD::Marker75", false);
