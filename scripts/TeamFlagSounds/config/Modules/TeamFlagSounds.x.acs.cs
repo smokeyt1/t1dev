@@ -1,20 +1,22 @@
 // TeamFlagSounds for 1.40/1.41
 // Plays flag sounds based on friendly or enemy team
-// Optionally filters out flag messages from Chat HUD. To enable:
-//   1) Use bindable command in Options, or
-//   2) Add $pref::TeamFlagSounds::ChatFilter = true; to config/ClientPrefs.cs
+// Optionally filters out flag messages from Chat HUD with Binds or xPrefs
+// Added xPref support
 // By Smokey
-// v0.6
+// v0.7
 
 function TeamFlagSounds::GameBinds::Init() after GameBinds::Init {
+	if ($xPrefs::Installed)
+		return;
+
 	$GameBinds::CurrentMapHandle = GameBinds::GetActionMap2( "actionMap.sae");
 	$GameBinds::CurrentMap = "actionMap.sae";
-	GameBinds::addBindCommand( "TeamFlagSounds Chat Filter", "TeamFlagSounds::Toggle();");
+	GameBinds::addBindCommand( "TeamFlagSounds Toggle", "TeamFlagSounds::ToggleEnabled();");
+	GameBinds::addBindCommand( "TeamFlagSounds Chat Filter", "TeamFlagSounds::ToggleFilter();");
 }
 
-if ($pref::TeamFlagSounds::ChatFilter == "")
-	$pref::TeamFlagSounds::ChatFilter = false;
-
+$pref::TeamFlagSounds::Enabled = $pref::TeamFlagSounds::Enabled == "" ? "True" : $pref::TeamFlagSounds::Enabled;
+$pref::TeamFlagSounds::ChatFilter = $pref::TeamFlagSounds::ChatFilter == "" ? "False" : $pref::TeamFlagSounds::ChatFilter;
 
 // Filter chat messages
 $TeamFlagSounds::Filterid = -1;
@@ -51,6 +53,9 @@ $TeamFlagSounds::DropEnemy = "flag_drop_enemy.wav";
 
 
 function TeamFlag::Captured(%team, %cl) {
+	if (!$pref::TeamFlagSounds::Enabled)
+		return;
+
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
 		localSound($TeamFlagSounds::CapFriendly);
 	} else {
@@ -59,6 +64,9 @@ function TeamFlag::Captured(%team, %cl) {
 }
 
 function TeamFlag::Taken(%team, %cl) {
+	if (!$pref::TeamFlagSounds::Enabled)
+		return;
+
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
 		localSound($TeamFlagSounds::TakenFriendly);
 	} else {
@@ -67,6 +75,9 @@ function TeamFlag::Taken(%team, %cl) {
 }
 
 function TeamFlag::Returned(%team, %cl) {
+	if (!$pref::TeamFlagSounds::Enabled)
+		return;
+
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
 		localSound($TeamFlagSounds::ReturnFriendly);
 	} else {
@@ -75,6 +86,9 @@ function TeamFlag::Returned(%team, %cl) {
 }
 
 function TeamFlag::Dropped(%team, %cl) {
+	if (!$pref::TeamFlagSounds::Enabled)
+		return;
+
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
 		localSound($TeamFlagSounds::DropFriendly);
 	} else {
@@ -90,6 +104,8 @@ Event::Attach(eventFlagReturn, TeamFlag::Returned);
 
 
 function flagfilter(%cl, %msg, %type) before onClientMessage {
+	if (!$pref::TeamFlagSounds::Enabled)
+		return;
 
 	if ($TeamFlag::muteVoices == true) {
 		$TeamFlag::muteVoices = false;
@@ -128,8 +144,32 @@ function flagfilter(%cl, %msg, %type) before onClientMessage {
 	}
 }
 
-function TeamFlagSounds::Toggle() {
+function TeamFlagSounds::ToggleFilter() {
 	$pref::TeamFlagSounds::ChatFilter = !$pref::TeamFlagSounds::ChatFilter;
 	%status = $pref::TeamFlagSounds::ChatFilter ? "ON" : "OFF";
-	remoteEP("<f2>TeamFlagSounds Chat Filter: <f1>" @ %status, 3, 2, 2, 10, 300);
+	remoteEP("<jc><f2>TeamFlagSounds Chat Filter: <f1>" @ %status, 3, 2, 2, 10, 300);
+}
+
+function TeamFlagSounds::ToggleEnabled() {
+	$pref::TeamFlagSounds::Enabled = !$pref::TeamFlagSounds::Enabled;
+	%status = $pref::TeamFlagSounds::Enabled ? "ENABLED" : "DISABLED";
+	remoteEP("<jc><f2>TeamFlagSounds <f1>" @ %status, 3, 2, 2, 10, 300);
+}
+
+// ================================================================================
+// xPrefs Support
+// ================================================================================
+
+function TeamFlagSounds::xSetup() after xPrefs::Setup {
+    xPrefs::Create("TeamFlagSounds", "TeamFlagSounds::xInit");
+}
+
+function TeamFlagSounds::xInit() {
+	xPrefs::addText("TeamFlagSounds::Header", "TeamFlagSounds");
+
+	xPrefs::addCheckbox("TeamFlagSounds::Checkbox1", "Enabled", "$pref::TeamFlagSounds::Enabled");
+	xPrefs::addCheckbox("TeamFlagSounds::Checkbox2", "Filter Flag Chat Messages", "$pref::TeamFlagSounds::ChatFilter");
+
+	xPrefs::addBindCommand("actionMap.sae", "Toggle", "TeamFlagSounds::ToggleEnabled();");
+	xPrefs::addBindCommand("actionMap.sae", "Chat Filter", "TeamFlagSounds::ToggleFilter();");
 }
