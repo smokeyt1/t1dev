@@ -47,3 +47,36 @@ $xFont::CenterPrint::F2 = $pref::xFont::CenterPrint::F2;
 // Credit to Altimor for this fix
 $pref::xFont::FixTextAlignment = $pref::xFont::FixTextAlignment == "" ? "False" : $pref::xFont::FixTextAlignment; // (Default: False)
 $xFont::FixTextAlignment = $pref::xFont::FixTextAlignment;
+
+
+// ================================================================================
+// xPrefs Support
+// ================================================================================
+
+function xFont::xSetup() after xPrefs::Setup {
+    xPrefs::Create("xFont", "xFont::xInit");
+}
+
+function xFont::xInit() {
+
+    xPrefs::AddTextFormat("xFont::Warning", "<jc><f2>Restart Tribes to take effect", "", False, "", 4);
+
+    xPrefs::addText("xFont::Header1", "xFont Options");
+    xPrefs::addCheckbox("xFont::Checkbox1", "Fix Text Alignment", "$pref::xFont::FixTextAlignment");
+
+    xPrefs::addText("xFont::Header2", "FearGuiFormattedText Fonts");
+    xPrefs::addTextEdit("xFont::TextEdit1", "<F0> Font", "$pref::xFont::FearGuiFormattedText::F0", "False", "255");
+    xPrefs::addTextEdit("xFont::TextEdit2", "<F1> Font", "$pref::xFont::FearGuiFormattedText::F1", "False", "255");
+    xPrefs::addTextEdit("xFont::TextEdit3", "<F2> Font", "$pref::xFont::FearGuiFormattedText::F2", "False", "255");
+
+    xPrefs::addText("xFont::Header3", "CenterPrint Fonts");
+    xPrefs::addTextEdit("xFont::TextEdit4", "<F0> Font", "$pref::xFont::CenterPrint::F0", "False", "255");
+    xPrefs::addTextEdit("xFont::TextEdit5", "<F1> Font", "$pref::xFont::CenterPrint::F1", "False", "255");
+    xPrefs::addTextEdit("xFont::TextEdit6", "<F2> Font", "$pref::xFont::CenterPrint::F2", "False", "255");
+
+    xPrefs::addHelpSection("xFont", "Plugin that adds font settings to certain HUD controls.");
+    xPrefs::addHelpSection("Fix Text Alignment", "Fix text alignment based on text control width rather than parent width.");
+    xPrefs::addHelpSection("FearGuiFormattedText Fonts", "FearGuiFormattedText Font Tags (<<F0> - <<F2>)");
+    xPrefs::addHelpSection("CenterPrint Fonts", "CenterPrint Font Tags (<<F0> - <<F2>)");
+
+}
