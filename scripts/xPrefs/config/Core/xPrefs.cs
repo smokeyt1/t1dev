@@ -3,7 +3,7 @@
 // Install to config/Core
 // By Smokey
 
-$xPrefs::Version = "0.17";
+$xPrefs::Version = "0.18";
 
 // TODO: Test all error messages
 // TODO: Use String::escapeFormatting on inputs
@@ -185,7 +185,7 @@ function xPrefs::addText(%objName, %text, %active, %offsetX, %preOffsetY, %postO
 }
 
 /**
- * xPrefs::AddTextFormat(objName, text, [height], [border], [offsetX], [preOffsetY], [postOffsetY])
+ * xPrefs::AddTextFormat(objName, text, [height], [border], [offsetX], [preOffsetY], [postOffsetY], [fillColor])
  *
  * Add a formatted text object to the script options page
  *
@@ -197,6 +197,7 @@ function xPrefs::addText(%objName, %text, %active, %offsetX, %preOffsetY, %postO
  * [offsetX] - X-axis offset. Optional parameter (Default: 18).
  * [preOffsetY] - Y-axis offset before the object. Optional parameter (Default: 0).
  * [postOffsetY] - Y-axis offset after the object. Optional parameter (Default: 2).
+ * [fillColor] - RGB numerical representation of the fill color. Each color must be between 0 and 1 as a % of 255. (e.g., "0 0 0" for Black, "1 1 1" for White). Optional parameter (Default: "").
  *
  * Returns: None
  *
@@ -207,7 +208,7 @@ function xPrefs::addText(%objName, %text, %active, %offsetX, %preOffsetY, %postO
  * xPrefs::AddTextFormat("MyHUD::TextFormat1", "<f2>Text Format");
  *
  */
-function xPrefs::AddTextFormat(%objName, %text, %height, %border, %offsetX, %preOffsetY, %postOffsetY) {
+function xPrefs::AddTextFormat(%objName, %text, %height, %border, %offsetX, %preOffsetY, %postOffsetY, %fillColor) {
 
     %scriptName = $xPrefs::scriptName;
     if (%scriptName == "") {
@@ -223,6 +224,19 @@ function xPrefs::AddTextFormat(%objName, %text, %height, %border, %offsetX, %pre
     if (String::FindSubStr(%objName, " ") != -1) {
         echoc(1, "xPrefs: Object name cannot contain spaces.");
 		return;
+    }
+
+    if (%fillColor != "") {
+        if (String::explode(String::Trim(%fillColor), " ", "digits" ) == 3) {
+            %r = round(clamp($digits[0], 0, 1), 6);
+            %g = round(clamp($digits[1], 0, 1), 6);
+            %b = round(clamp($digits[2], 0, 1), 6);
+
+            %fillColor = %r ~ " " ~ %g ~ " " ~ %b;
+        } else {
+            echoc(1, "xPrefs: Invalid fill color.");
+            return;
+        }
     }
 
     %height = %height == "" ? $pref::xPrefs::lineHeight : round(%height, 0);
@@ -244,8 +258,8 @@ function xPrefs::AddTextFormat(%objName, %text, %height, %border, %offsetX, %pre
         altConsoleCommand = "";
         deleteOnLoseContent = "True";
         ownObjects = "True";
-        opaque = "False";
-        fillColor = "0 0 0";
+        opaque = %fillColor != "" ? "True" : "False";
+        fillColor = %fillColor != "" ? %fillColor : "0 0 0";
         selectFillColor = "0 0 0";
         ghostFillColor = "0.745098 0.811765 0.870588";
         border = %border;
