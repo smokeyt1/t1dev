@@ -1,7 +1,7 @@
 // WepRet
 // Supports xEvent and xPrefs
 // By Smokey
-// v0.1
+// v0.2
 
 
 $pref::WepRet::Enabled = $pref::WepRet::Enabled == "" ? "True" : $pref::WepRet::Enabled;
@@ -135,7 +135,7 @@ function WepRet::xInit() {
 	xPrefs::addText("WepRet::Header2", "Reticle Images");
     xPrefs::addComboBox("WepRet::ComboWeapon", "Weapon", "", "WepRet::WeaponComboChange();", True, "$WepRet::Weapon");
     xPrefs::addComboBox("WepRet::ComboReticle", "Reticle", "", "WepRet::ReticleComboChange();", True, "$WepRet::Image");
-    xPrefs::AddTextFormat("WepRet::Image", "", 128, False, "", 40);
+    xPrefs::AddTextFormat("WepRet::Image", "", 132, True, 28, 40, "", "0.210937 0.269531 0.308593");
 
     FGCombo::setSelected("WepRet::ComboWeapon", 0);
     WepRet::WeaponComboChange();
