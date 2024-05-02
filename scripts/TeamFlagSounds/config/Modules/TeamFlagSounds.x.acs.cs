@@ -3,7 +3,7 @@
 // Optionally filters out flag messages from Chat HUD with Binds or xPrefs
 // Added xPref support
 // By Smokey
-// v0.7
+// v0.8
 
 function TeamFlagSounds::GameBinds::Init() after GameBinds::Init {
 	if ($xPrefs::Installed)
@@ -15,8 +15,26 @@ function TeamFlagSounds::GameBinds::Init() after GameBinds::Init {
 	GameBinds::addBindCommand( "TeamFlagSounds Chat Filter", "TeamFlagSounds::ToggleFilter();");
 }
 
+// Prefs
 $pref::TeamFlagSounds::Enabled = $pref::TeamFlagSounds::Enabled == "" ? "True" : $pref::TeamFlagSounds::Enabled;
 $pref::TeamFlagSounds::ChatFilter = $pref::TeamFlagSounds::ChatFilter == "" ? "False" : $pref::TeamFlagSounds::ChatFilter;
+
+// Flag Captured
+$pref::TeamFlagSounds::CapFriendly = $pref::TeamFlagSounds::CapFriendly == "" ? "flag_cap_friendly.wav" : $pref::TeamFlagSounds::CapFriendly;
+$pref::TeamFlagSounds::CapEnemy = $pref::TeamFlagSounds::CapEnemy == "" ? "flag_cap_enemy.wav" : $pref::TeamFlagSounds::CapEnemy;
+
+// Flag Taken
+$pref::TeamFlagSounds::TakenFriendly = $pref::TeamFlagSounds::TakenFriendly == "" ? "flag_taken_friendly.wav" : $pref::TeamFlagSounds::TakenFriendly;
+$pref::TeamFlagSounds::TakenEnemy = $pref::TeamFlagSounds::TakenEnemy == "" ? "flag_taken_enemy.wav" : $pref::TeamFlagSounds::TakenEnemy;
+
+// Flag Returned
+$pref::TeamFlagSounds::ReturnFriendly = $pref::TeamFlagSounds::ReturnFriendly == "" ? "flag_return_friendly.wav" : $pref::TeamFlagSounds::ReturnFriendly;
+$pref::TeamFlagSounds::ReturnEnemy = $pref::TeamFlagSounds::ReturnEnemy == "" ? "flag_return_enemy.wav" : $pref::TeamFlagSounds::ReturnEnemy;
+
+// Flag Dropped
+$pref::TeamFlagSounds::DropFriendly = $pref::TeamFlagSounds::DropFriendly == "" ? "flag_drop_friendly.wav" : $pref::TeamFlagSounds::DropFriendly;
+$pref::TeamFlagSounds::DropEnemy = $pref::TeamFlagSounds::DropEnemy == "" ? "flag_drop_enemy.wav" : $pref::TeamFlagSounds::DropEnemy;
+
 
 // Filter chat messages
 $TeamFlagSounds::Filterid = -1;
@@ -35,31 +53,23 @@ $TeamFlagSounds::Filter[$TeamFlagSounds::Filterid++] = "You dropped the * flag!"
 $TeamFlagSounds::Filter[$TeamFlagSounds::Filterid++] = "Your flag was dropped in the field.";
 $TeamFlagSounds::Filter[$TeamFlagSounds::Filterid++] = "The * flag was dropped in the field.";
 
-// Flag Captured
-$TeamFlagSounds::CapFriendly = "flag_cap_friendly.wav";
-$TeamFlagSounds::CapEnemy = "flag_cap_enemy.wav";
-
-// Flag Taken
-$TeamFlagSounds::TakenFriendly = "flag_taken_friendly.wav";
-$TeamFlagSounds::TakenEnemy = "flag_taken_enemy.wav";
-
-// Flag Returned
-$TeamFlagSounds::ReturnFriendly = "flag_return_friendly.wav";
-$TeamFlagSounds::ReturnEnemy = "flag_return_enemy.wav";
-
-// Flag Dropped
-$TeamFlagSounds::DropFriendly = "flag_drop_friendly.wav";
-$TeamFlagSounds::DropEnemy = "flag_drop_enemy.wav";
-
 
 function TeamFlag::Captured(%team, %cl) {
 	if (!$pref::TeamFlagSounds::Enabled)
 		return;
 
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
-		localSound($TeamFlagSounds::CapFriendly);
+		if (File::findFirst($pref::TeamFlagSounds::CapFriendly) != "") {
+			localSound($pref::TeamFlagSounds::CapFriendly);
+		} else {
+			localSound("flagcapture.ogg");
+		}
 	} else {
-		localSound($TeamFlagSounds::CapEnemy);
+		if (File::findFirst($pref::TeamFlagSounds::CapEnemy) != "") {
+			localSound($pref::TeamFlagSounds::CapEnemy);
+		} else {
+			localSound("flagcapture.ogg");
+		}
 	}
 }
 
@@ -68,9 +78,17 @@ function TeamFlag::Taken(%team, %cl) {
 		return;
 
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
-		localSound($TeamFlagSounds::TakenFriendly);
+		if (File::findFirst($pref::TeamFlagSounds::TakenFriendly) != "") {
+			localSound($pref::TeamFlagSounds::TakenFriendly);
+		} else {
+			localSound("flag1.ogg");
+		}
 	} else {
-		localSound($TeamFlagSounds::TakenEnemy);
+		if (File::findFirst($pref::TeamFlagSounds::TakenEnemy) != "") {
+			localSound($pref::TeamFlagSounds::TakenEnemy);
+		} else {
+			localSound("flag1.ogg");
+		}
 	}
 }
 
@@ -79,9 +97,17 @@ function TeamFlag::Returned(%team, %cl) {
 		return;
 
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
-		localSound($TeamFlagSounds::ReturnFriendly);
+		if (File::findFirst($pref::TeamFlagSounds::ReturnFriendly) != "") {
+			localSound($pref::TeamFlagSounds::ReturnFriendly);
+		} else {
+			localSound("flagreturn.ogg");
+		}
 	} else {
-		localSound($TeamFlagSounds::ReturnEnemy);
+		if (File::findFirst($pref::TeamFlagSounds::ReturnEnemy) != "") {
+			localSound($pref::TeamFlagSounds::ReturnEnemy);
+		} else {
+			localSound("flagreturn.ogg");
+		}
 	}
 }
 
@@ -90,9 +116,9 @@ function TeamFlag::Dropped(%team, %cl) {
 		return;
 
 	if (Client::GetTeam(getManagerID()) == Client::getTeam(%cl)) {
-		localSound($TeamFlagSounds::DropFriendly);
+		localSound($pref::TeamFlagSounds::DropFriendly);
 	} else {
-		localSound($TeamFlagSounds::DropEnemy);
+		localSound($pref::TeamFlagSounds::DropEnemy);
 	}
 }
 
@@ -165,10 +191,19 @@ function TeamFlagSounds::xSetup() after xPrefs::Setup {
 }
 
 function TeamFlagSounds::xInit() {
-	xPrefs::addText("TeamFlagSounds::Header", "TeamFlagSounds");
-
+	xPrefs::addText("TeamFlagSounds::Header1", "TeamFlagSounds");
 	xPrefs::addCheckbox("TeamFlagSounds::Checkbox1", "Enabled", "$pref::TeamFlagSounds::Enabled");
 	xPrefs::addCheckbox("TeamFlagSounds::Checkbox2", "Filter Flag Chat Messages", "$pref::TeamFlagSounds::ChatFilter");
+
+	xPrefs::addText("TeamFlagSounds::Header2", "Flag Sounds");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit1", "Capture (Friendly)", "$pref::TeamFlagSounds::CapFriendly", "False", "255");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit2", "Capture (Enemy)", "$pref::TeamFlagSounds::CapEnemy", "False", "255");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit3", "Taken (Friendly)", "$pref::TeamFlagSounds::TakenFriendly", "False", "255");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit4", "Taken (Enemy)", "$pref::TeamFlagSounds::TakenEnemy", "False", "255");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit5", "Returned (Friendly)", "$pref::TeamFlagSounds::ReturnFriendly", "False", "255");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit6", "Returned (Enemy)", "$pref::TeamFlagSounds::ReturnEnemy", "False", "255");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit7", "Drop (Friendly)", "$pref::TeamFlagSounds::DropFriendly", "False", "255");
+	xPrefs::addTextEdit("TeamFlagSounds::TextEdit8", "Drop (Enemy)", "$pref::TeamFlagSounds::DropEnemy", "False", "255");
 
 	xPrefs::addBindCommand("actionMap.sae", "Toggle", "TeamFlagSounds::ToggleEnabled();");
 	xPrefs::addBindCommand("actionMap.sae", "Chat Filter", "TeamFlagSounds::ToggleFilter();");

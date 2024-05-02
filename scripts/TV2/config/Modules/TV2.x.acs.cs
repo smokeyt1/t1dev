@@ -1,7 +1,7 @@
 // TV2 for Tribes 1.40/1.41
 // Install to config/Modules
 // By Smokey
-// v0.3
+// v0.4
 //
 // Enhanced TV script with additional features:
 // - Game binds in Options menu
@@ -196,8 +196,9 @@ function TV2::Cancel() {
 
     if ($TV2::MenuEnabled) {
 		$TV2::MenuEnabled = false;
-		PopActionMap("TV2.sae");
 	}
+
+	PopActionMap("TV2.sae");
 
 	Client::ToggleCmdObserver("False");
 
