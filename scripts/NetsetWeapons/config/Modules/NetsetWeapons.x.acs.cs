@@ -2,7 +2,7 @@
 // Change netset settings based on mounted weapon
 // Requires xPrefs and xEvent
 // By Smokey
-// v0.1
+// v0.2
 
 $NetsetWep::Weapon[0] = "Blaster";
 $NetsetWep::Weapon[1] = "Chaingun";
@@ -17,11 +17,19 @@ $NetsetWep::WeaponCount = 9;
 
 $pref::NetsetWep::Popup = $pref::NetsetWep::Popup == "" ? False : $pref::NetsetWep::Popup;
 
-for (%i = 0; %i < $NetsetWep::WeaponCount; %i++) {
-	%weapon = String::Replace($NetsetWep::Weapon[%i], " ", "_");
+function NetsetWep::Init() {
+    if ($NetsetWep::Loaded)
+        return;
 
-	$pref::NetsetWep::TERP[%weapon] = $pref::NetsetWep::TERP[%weapon] == "" ? 100 : $pref::NetsetWep::TERP[%weapon];
-	$pref::NetsetWep::PFT[%weapon] = $pref::NetsetWep::PFT[%weapon] == "" ? 160 : $pref::NetsetWep::PFT[%weapon];
+    $NetsetWep::Loaded = true;
+
+    for (%i = 0; %i < $NetsetWep::WeaponCount; %i++) {
+        %weapon = String::Replace($NetsetWep::Weapon[%i], " ", "_");
+
+        $pref::NetsetWep::TERP[%weapon] = $pref::NetsetWep::TERP[%weapon] == "" ? 100 : $pref::NetsetWep::TERP[%weapon];
+        $pref::NetsetWep::PFT[%weapon] = $pref::NetsetWep::PFT[%weapon] == "" ? 160 : $pref::NetsetWep::PFT[%weapon];
+    }
+
 }
 
 function NetsetWep::Update(%slot, %item) {
@@ -47,6 +55,8 @@ function NetsetWep::Update(%slot, %item) {
     }
 }
 Event::Attach(eventItemMountUpdate, NetsetWep::Update); // Requires xEvent.dll
+
+NetsetWep::Init();
 
 // ================================================================================
 // xPrefs Support
