@@ -11,7 +11,7 @@ $pref::mj::showhpbars = $pref::mj::showhpbars != "" ? $pref::mj::showhpbars : tr
 $mj::showhpbars = $pref::mj::showhpbars;
 
 //show jet bars
-$pref::mj::showjetbars = $pref::mj::showjetbars != "" ? $pref::mj::showjetbars : true;
+$pref::mj::showjetbars = $pref::mj::showjetbars != "" ? $pref::mj::showjetbars : false;
 $mj::showjetbars = $pref::mj::showjetbars;
 
 //only show when crouching
