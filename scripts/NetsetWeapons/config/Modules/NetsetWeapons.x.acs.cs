@@ -2,7 +2,7 @@
 // Change netset settings based on mounted weapon
 // Requires xPrefs and xEvent
 // By Smokey
-// v0.3
+// v0.4
 
 $NetsetWep::Weapon[0] = "Blaster";
 $NetsetWep::Weapon[1] = "Chaingun";
@@ -64,22 +64,11 @@ function NetsetWep::Update(%slot, %item) {
 }
 
 function NetsetWep::ControlObjectChange() {
-    if ($xLoader::netset != True && $LoaderPlugin::netset != True) return;
+    %item = getMountedItem(0);
 
-    %desc = getItemDesc(getMountedItem(0));
-
-    if (%desc != "") {
-        %weapon = String::Replace(%desc, " ", "_");
-
-        if ($pref::NetsetWep::TERP[%weapon] != "" && $pref::NetsetWep::PFT[%weapon] != "") {
-            $net::interpolateTime = $pref::NetsetWep::TERP[%weapon];
-            $net::predictForwardTime = $pref::NetsetWep::PFT[%weapon];
-        } else {
-            $net::interpolateTime = $pref::NetsetWep::TERP["Default"];
-            $net::predictForwardTime = $pref::NetsetWep::PFT["Default"];
-        }
+    if (PSC::getControlMode() == "playing" && %item != "" && %item != -1) {
+        NetsetWep::Update(0, %item);
     }
-
 }
 
 Event::Attach(eventItemMountUpdate, NetsetWep::Update); // Requires xEvent.dll
