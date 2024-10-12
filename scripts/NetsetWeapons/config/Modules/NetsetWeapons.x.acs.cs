@@ -2,7 +2,7 @@
 // Change netset settings based on mounted weapon
 // Requires xPrefs and xEvent
 // By Smokey
-// v0.2
+// v0.3
 
 $NetsetWep::Weapon[0] = "Blaster";
 $NetsetWep::Weapon[1] = "Chaingun";
@@ -13,7 +13,8 @@ $NetsetWep::Weapon[5] = "Laser Rifle";
 $NetsetWep::Weapon[6] = "Mortar";
 $NetsetWep::Weapon[7] = "Plasma Gun";
 $NetsetWep::Weapon[8] = "Targeting Laser";
-$NetsetWep::WeaponCount = 9;
+$NetsetWep::Weapon[9] = "Default";
+$NetsetWep::WeaponCount = 10;
 
 $pref::NetsetWep::Popup = $pref::NetsetWep::Popup == "" ? False : $pref::NetsetWep::Popup;
 
@@ -26,21 +27,28 @@ function NetsetWep::Init() {
     for (%i = 0; %i < $NetsetWep::WeaponCount; %i++) {
         %weapon = String::Replace($NetsetWep::Weapon[%i], " ", "_");
 
-        $pref::NetsetWep::TERP[%weapon] = $pref::NetsetWep::TERP[%weapon] == "" ? 100 : $pref::NetsetWep::TERP[%weapon];
-        $pref::NetsetWep::PFT[%weapon] = $pref::NetsetWep::PFT[%weapon] == "" ? 160 : $pref::NetsetWep::PFT[%weapon];
+        $pref::NetsetWep::TERP[%weapon] = $pref::NetsetWep::TERP[%weapon] == "" ? 32 : $pref::NetsetWep::TERP[%weapon];
+        $pref::NetsetWep::PFT[%weapon] = $pref::NetsetWep::PFT[%weapon] == "" ? 64 : $pref::NetsetWep::PFT[%weapon];
     }
 
 }
 
 function NetsetWep::Update(%slot, %item) {
+    if ($xLoader::netset != True && $LoaderPlugin::netset != True) return;
+
     if (%slot != 0 || %item == -1)
         return;
 
     %desc = getItemDesc(%item);
     %weapon = String::Replace(%desc, " ", "_");
 
-    $net::interpolateTime = $pref::NetsetWep::TERP[%weapon];
-    $net::predictForwardTime = $pref::NetsetWep::PFT[%weapon];
+    if ($pref::NetsetWep::TERP[%weapon] != "" && $pref::NetsetWep::PFT[%weapon] != "") {
+        $net::interpolateTime = $pref::NetsetWep::TERP[%weapon];
+        $net::predictForwardTime = $pref::NetsetWep::PFT[%weapon];
+    } else {
+        $net::interpolateTime = $pref::NetsetWep::TERP["Default"];
+        $net::predictForwardTime = $pref::NetsetWep::PFT["Default"];
+    }
 
     if ($pref::NetsetWep::Popup) {
         %msg = "<jc><f2>Weapon: <f1>" ~ %desc;
@@ -54,7 +62,28 @@ function NetsetWep::Update(%slot, %item) {
         }
     }
 }
+
+function NetsetWep::ControlObjectChange() {
+    if ($xLoader::netset != True && $LoaderPlugin::netset != True) return;
+
+    %desc = getItemDesc(getMountedItem(0));
+
+    if (%desc != "") {
+        %weapon = String::Replace(%desc, " ", "_");
+
+        if ($pref::NetsetWep::TERP[%weapon] != "" && $pref::NetsetWep::PFT[%weapon] != "") {
+            $net::interpolateTime = $pref::NetsetWep::TERP[%weapon];
+            $net::predictForwardTime = $pref::NetsetWep::PFT[%weapon];
+        } else {
+            $net::interpolateTime = $pref::NetsetWep::TERP["Default"];
+            $net::predictForwardTime = $pref::NetsetWep::PFT["Default"];
+        }
+    }
+
+}
+
 Event::Attach(eventItemMountUpdate, NetsetWep::Update); // Requires xEvent.dll
+Event::Attach(eventControlObjectChange, NetsetWep::ControlObjectChange); // Requires xEvent.dll
 
 NetsetWep::Init();
 
