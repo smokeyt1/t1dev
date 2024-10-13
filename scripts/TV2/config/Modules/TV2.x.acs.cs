@@ -1,7 +1,7 @@
 // TV2 for Tribes 1.40/1.41
 // Install to config/Modules
 // By Smokey
-// v0.4
+// v0.5
 //
 // Enhanced TV script with additional features:
 // - Game binds in Options menu
@@ -43,6 +43,9 @@ function TV2::ToggleMenu() {
 		remoteBP(2048, "", 0);
 		return;
 	}
+
+	if (PSC::getControlMode() != "playing")
+		return;
 
     $TV2::MenuEnabled = true;
 
@@ -175,6 +178,9 @@ function TV2::Carrier() {
 		PopActionMap("TV2.sae");
         remoteBP(2048, "", 0);
 	}
+
+	if (PSC::getControlMode() != "playing")
+		return;
 
 	if ($TV2::FlagCarrier == "") {
 		remoteBP(2048, "<jc><f1>No Flag Carrier. Unable to observe!", 2);
