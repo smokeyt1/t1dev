@@ -1,7 +1,7 @@
 // MultiBinds
 // Supports xPrefs
 // by Smokey
-// v0.1
+// v0.2
 
 $pref::MultiBinds::Bind1A = $pref::MultiBinds::Bind1A == "" ? "Disc Launcher" : $pref::MultiBinds::Bind1A;
 $pref::MultiBinds::Bind1B = $pref::MultiBinds::Bind1B == "" ? "Grenade Launcher" : $pref::MultiBinds::Bind1B;
@@ -35,9 +35,9 @@ function MultiBinds::Use(%key) {
 
 	if (%weapon == %weaponA && GetItemCount(%weaponB) == 1) {
 		use(%weaponB);
-	} else if (%weap != %weaponA && GetItemCount(%weaponA) == 1) {
+	} else if (%weapon != %weaponA && GetItemCount(%weaponA) == 1) {
 		use(%weaponA);
-	} else if (%weap != %weaponB && GetItemCount(%weaponB) == 1) {
+	} else if (%weapon != %weaponB && GetItemCount(%weaponB) == 1) {
 		use(%weaponB);
 	}
 
