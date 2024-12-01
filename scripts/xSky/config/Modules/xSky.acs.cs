@@ -1,10 +1,10 @@
 // xSky by Smokey
 // xSky.dll required
-// v0.6
+// v0.7
 
 // Skies (located in 'base/Entities/skies/<SkyName>.zip')
 // Format is $xSky::Mission::<MapName> = "<SkyName>";
-$xSky::Mission::Default = "cloudscape"; // Default sky
+$xSky::Mission::Default = "Cloudscape"; // Default sky
 
 $xSky::Mission::BroadsideLT = "";
 $xSky::Mission::CanyonCrusadeDeluxeLT = "";
@@ -20,10 +20,11 @@ $xSky::Mission::StonehengeLT = "";
 
 
 // Global Options
-// Each individual sky sets specific Rotation and Speed parameters. Uncomment below to override these settings globally.
+// Each individual sky sets specific Rotation, Speed, and Haze color parameters. Uncomment below to override these settings globally.
 //
-//$xSky::Rotation = 0;  // Rotation in degrees of the cubic skybox. Values from 0 to 360.
-//$xSky::Speed = 0;     // Rotation speed of the cubic skybox. Values from 0 to 100 are reasonable (can be negative).
+//$xSky::Rotation = 0;          // Rotation in degrees of the cubic skybox. Values from 0 to 360.
+//$xSky::Speed = 0;             // Rotation speed of the cubic skybox. Values from 0 to 100 are reasonable (can be negative).
+//$xSky::Haze = "255 255 255";  // Haze RGB (red, green, blue). Values can be between 0 and 255, inclusive.
 
 
 // ==================================================================================================
@@ -79,11 +80,13 @@ function xSky::loadSky() {
                 echoc(1, %dml ~ " is not loaded or does not exist.");
                 xSky::Disable();
                 xSky::setSpeed(0);
+                xSky::resetHaze();
                 return;
             }
 
             xSky::Enable();
             xSky::setDML(%file);
+            xSky::resetHaze();
 
             %file = %skyName ~ "_sky.cs";
             if (File::findFirst(%file) != "") {
@@ -95,6 +98,14 @@ function xSky::loadSky() {
 
                 xSky::setRotation($xSky::Settings::Rotation);
                 xSky::setSpeed($xSky::Settings::Speed);
+
+                if ($xSky::Settings::Haze != "" && String::explode($xSky::Settings::Haze, " ", "haze") == 3) {
+                    %r = $haze[0];
+                    %g = $haze[1];
+                    %b = $haze[2];
+
+                    xSky::setHaze(%r, %g, %b);
+                }
             }
 
             if ($xSky::Rotation != "") {
@@ -104,10 +115,18 @@ function xSky::loadSky() {
             if ($xSky::Speed != "") {
                 xSky::setSpeed($xSky::Speed);
             }
-            
+
+            if ($xSky::Haze != "" && String::explode($xSky::Haze, " ", "haze") == 3) {
+                %r = $haze[0];
+                %g = $haze[1];
+                %b = $haze[2];
+
+                xSky::setHaze(%r, %g, %b);
+            }
         } else {
             xSky::Disable();
             xSky::setSpeed(0);
+            xSky::resetHaze();
         }
     }
 }

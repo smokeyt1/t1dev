@@ -2,7 +2,7 @@
 // xLoader required
 // xSky.dll required
 // xPrefs required
-// v0.7
+// v0.8
 
 $xSky::skyCount = 0; // Skies loaded from base/skies
 $xSky::pref::Count = 0; // Loaded prefs
@@ -67,11 +67,15 @@ function xSky::xPrefs_Init() {
             $xSky::Settings::Rotation = $xSky::Settings::Rotation != "" ? $xSky::Settings::Rotation : "0";
             $xSky::Settings::Speed = $xSky::Settings::Speed != "" ? $xSky::Settings::Speed : "0";
 
-            %settings = $xSky::Settings::Rotation ~ "|" ~ $xSky::Settings::Speed;
+            if ($xSky::Settings::Haze == "" || String::explode($xSky::Settings::Haze, " ", "haze") != 3) {
+                $xSky::Settings::Haze = "0";
+            }
+
+            %settings = $xSky::Settings::Rotation ~ "|" ~ $xSky::Settings::Speed ~ "|" ~ $xSky::Settings::Haze;
             $xSky::Settings[%name] = %settings;
             //echoc(1, "[xSky] Loading custom settings " ~ %name ~ ": " ~ %settings);
         } else {
-            %settings = "0|0"; // Default settings
+            %settings = "0|0|0"; // Default settings
             $xSky::Settings[%name] = %settings;
             //echoc(1, "[xSky] Loading default settings " ~ %name ~ ": " ~ %settings);
         }
@@ -87,7 +91,7 @@ function xSky::xPrefs_Init() {
         %sky = $pref::xSky::Sky[%i];
         %settings = $pref::xSky::Settings[%i];
 
-        if (String::explode(%settings, "|", "settings") != 2) {
+        if (String::explode(%settings, "|", "settings") != 3) {
             $pref::xSky::Settings[%i] = "";
             %settings = "";
         }
@@ -183,6 +187,13 @@ function xSky::xPrefs_loadSky() {
         %file = $xSky::File[%sky];
         %settings = $xSky::Settings[%sky];
 
+        for (%i = 0; %i < $xSky::pref::Count; %i++) { // Custom setting
+            if (%sky == $xSky::pref::Sky[%i] && $xSky::pref::Settings[%i] != "") {
+                %settings = $xSky::pref::Settings[%i];
+                break;
+            }
+	    }
+
         //echoc(1, "[xSky] loadSky file: " ~ %file);
 
         if (%sky == "" || %sky == "None") {
@@ -190,6 +201,7 @@ function xSky::xPrefs_loadSky() {
             xSky::setDML($xSky::DefaultDML);
             xSky::setRotation($xSky::DefaultRotation);
             xSky::setSpeed(0);
+            xSky::resetHaze();
             xSky::Disable();
         } else {
             if (%file != "" && %file != "None") {
@@ -198,19 +210,29 @@ function xSky::xPrefs_loadSky() {
 
                 xSky::Enable();
                 xSky::setDML(%file);
+                xSky::resetHaze();
 
-                if (%settings != "" && String::explode(%settings, "|", "settings") == 2) {
+                if (%settings != "" && String::explode(%settings, "|", "settings") == 3) {
 
                     %rotation = $settings[0];
                     %speed = $settings[1];
+                    %haze = $settings[2];
 
                     //echoc(1, "[xSky] Settings:");
                     //echoc(1, "[xSky] Rotation: " ~ %rotation);
                     //echoc(1, "[xSky] Speed: " ~ %speed);
+                    //echoc(1, "[xSky] Haze: " ~ %haze);
 
                     xSky::setRotation(%rotation);
                     xSky::setSpeed(%speed);
 
+                    if (%haze != "" && String::explode(%haze, " ", "haze") == 3) {
+                        %r = $haze[0];
+                        %g = $haze[1];
+                        %b = $haze[2];
+
+                        xSky::setHaze(%r, %g, %b);
+                    }
                 }
 
                 if ($xSky::Rotation != "") {
@@ -219,6 +241,14 @@ function xSky::xPrefs_loadSky() {
 
                 if ($xSky::Speed != "") {
                     xSky::setSpeed($xSky::Speed);
+                }
+
+                if ($xSky::Haze != "" && String::explode($xSky::Haze, " ", "haze") == 3) {
+                    %r = $haze[0];
+                    %g = $haze[1];
+                    %b = $haze[2];
+
+                    xSky::setHaze(%r, %g, %b);
                 }
             }
         }
